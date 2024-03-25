@@ -13,6 +13,7 @@
 
 extern crate markdown;
 mod configuration;
+mod error;
 mod hast;
 mod hast_util_to_swc;
 mod mdast_util_to_hast;
@@ -33,6 +34,7 @@ use crate::{
 use markdown::{to_mdast, Constructs, Location, ParseOptions};
 
 pub use crate::configuration::{MdxConstructs, MdxParseOptions, Options};
+pub use crate::error::Error;
 pub use crate::mdx_plugin_recma_document::JsxRuntime;
 
 /// Turn MDX into JavaScript.
