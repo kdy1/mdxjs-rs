@@ -1535,7 +1535,7 @@ _jsxDEV(_Fragment, {
     }
 
     #[test]
-    fn jsx_element_development_no_filepath() -> Result<(), String> {
+    fn jsx_element_development_no_filepath() -> Result<(), Error> {
         let mut program = Program {
             path: None,
             comments: vec![],

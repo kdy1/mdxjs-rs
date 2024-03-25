@@ -31,6 +31,7 @@ use crate::{
     swc::{parse_esm, parse_expression, serialize},
     swc_util_build_jsx::{swc_util_build_jsx, Options as BuildOptions},
 };
+use error::capture;
 use markdown::{to_mdast, Constructs, Location, ParseOptions};
 
 pub use crate::configuration::{MdxConstructs, MdxParseOptions, Options};
@@ -113,7 +114,7 @@ pub fn compile(value: &str, options: &Options) -> Result<String, Error> {
     };
 
     let location = Location::new(value.as_bytes());
-    let mdast = to_mdast(value, &parse_options)?;
+    let mdast = capture(|| to_mdast(value, &parse_options))?;
     let hast = mdast_util_to_hast(&mdast);
     let mut program = hast_util_to_swc(&hast, options.filepath.clone(), Some(&location))?;
     mdx_plugin_recma_document(&mut program, &document_options, Some(&location))?;
