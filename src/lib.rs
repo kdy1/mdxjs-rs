@@ -54,7 +54,7 @@ pub use crate::mdx_plugin_recma_document::JsxRuntime;
 ///
 /// This project errors for many different reasons, such as syntax errors in
 /// the MDX format or misconfiguration.
-pub fn compile(value: &str, options: &Options) -> Result<String, String> {
+pub fn compile(value: &str, options: &Options) -> Result<String, Error> {
     let parse_options = ParseOptions {
         constructs: Constructs {
             attention: options.parse.constructs.attention,

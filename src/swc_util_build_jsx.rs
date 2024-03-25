@@ -9,6 +9,7 @@ use crate::swc_utils::{
     create_str_expression, jsx_attribute_name_to_prop_name, jsx_element_name_to_expression,
     prefix_error_with_point, span_to_position,
 };
+use crate::Error;
 use core::str;
 use markdown::Location;
 use swc_core::common::{
@@ -35,8 +36,8 @@ pub fn swc_util_build_jsx(
     program: &mut Program,
     options: &Options,
     location: Option<&Location>,
-) -> Result<(), String> {
-    let directives = find_directives(&program.comments, location)?;
+) -> Result<(), Error> {
+    let directives: Directives = find_directives(&program.comments, location)?;
 
     let mut state = State {
         development: options.development,
@@ -149,7 +150,7 @@ struct State<'a> {
     /// Location info.
     location: Option<&'a Location>,
     /// Whether walking the tree produced an error.
-    error: Option<String>,
+    error: Option<Error>,
     /// Path to file.
     filepath: Option<String>,
     /// Whether the user is in development mode.
