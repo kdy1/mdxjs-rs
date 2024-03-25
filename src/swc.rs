@@ -2,8 +2,12 @@
 
 extern crate markdown;
 
-use crate::swc_utils::{
-    create_span, prefix_error_with_point, DropContext, RewritePrefixContext, RewriteStopsContext,
+use crate::{
+    swc_utils::{
+        create_span, prefix_error_with_point, DropContext, RewritePrefixContext,
+        RewriteStopsContext,
+    },
+    Error,
 };
 use markdown::{mdast::Stop, Location, MdxExpressionKind, MdxSignal};
 use std::rc::Rc;
@@ -49,7 +53,7 @@ pub fn parse_esm_to_tree(
 }
 
 /// Core to parse ESM.
-fn parse_esm_core(value: &str) -> Result<Module, (Span, String)> {
+fn parse_esm_core(value: &str) -> Result<Module, Error> {
     let (file, syntax, version) = create_config(value.into());
     let mut errors = vec![];
     let result = parse_file_as_module(&file, syntax, version, None, &mut errors);
@@ -249,13 +253,19 @@ pub fn flat_comments(single_threaded_comments: SingleThreadedComments) -> Vec<Co
 ///
 /// * If the error happens at `value_len`, yields `MdxSignal::Eof`
 /// * Else, yields `MdxSignal::Error`.
-fn swc_error_to_signal(span: Span, reason: &str, value_len: usize) -> MdxSignal {
+fn swc_error_to_signal(
+    span: Span,
+    reason: swc_core::ecma::parser::error::Error,
+    value_len: usize,
+) -> MdxSignal {
     let error_end = span.hi.to_usize();
 
     if error_end >= value_len {
         MdxSignal::Eof(reason.into())
     } else {
-        MdxSignal::Error(reason.into(), span.lo.to_usize())
+        crate::error::set_error(crate::Error::Parser(span, reason.into()));
+
+        MdxSignal::Error(String::new(), span.lo.to_usize())
     }
 }
 

@@ -178,7 +178,7 @@ impl<'a> State<'a> {
     fn jsx_attribute_value_to_expression(
         &mut self,
         value: Option<JSXAttrValue>,
-    ) -> Result<Expr, String> {
+    ) -> Result<Expr, Error> {
         match value {
             // Boolean prop.
             None => Ok(create_bool_expression(true)),
@@ -207,7 +207,7 @@ impl<'a> State<'a> {
     fn jsx_children_to_expressions(
         &mut self,
         mut children: Vec<JSXElementChild>,
-    ) -> Result<Vec<Expr>, String> {
+    ) -> Result<Vec<Expr>, Error> {
         let mut result = vec![];
         children.reverse();
         while let Some(child) = children.pop() {
@@ -375,7 +375,7 @@ impl<'a> State<'a> {
         name: Expr,
         attributes: Option<Vec<JSXAttrOrSpread>>,
         mut children: Vec<Expr>,
-    ) -> Result<Expr, String> {
+    ) -> Result<Expr, Error> {
         let (callee, parameters) = if self.automatic {
             let is_static_children = children.len() > 1;
             let (props, key) = self.jsx_attributes_to_expressions(attributes, Some(children))?;
@@ -549,7 +549,7 @@ impl<'a> State<'a> {
     }
 
     /// Turn a JSX element into an expression.
-    fn jsx_element_to_expression(&mut self, element: JSXElement) -> Result<Expr, String> {
+    fn jsx_element_to_expression(&mut self, element: JSXElement) -> Result<Expr, Error> {
         let children = self.jsx_children_to_expressions(element.children)?;
         let mut name = jsx_element_name_to_expression(element.opening.name);
 
@@ -566,7 +566,7 @@ impl<'a> State<'a> {
     }
 
     /// Turn a JSX fragment into an expression.
-    fn jsx_fragment_to_expression(&mut self, fragment: JSXFragment) -> Result<Expr, String> {
+    fn jsx_fragment_to_expression(&mut self, fragment: JSXFragment) -> Result<Expr, Error> {
         let name = if self.automatic {
             self.import_fragment = true;
             create_ident_expression("_Fragment")
