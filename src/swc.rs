@@ -39,7 +39,7 @@ pub fn parse_esm_to_tree(
     value: &str,
     stops: &[Stop],
     location: Option<&Location>,
-) -> Result<Module, String> {
+) -> Result<Module, Error> {
     let result = parse_esm_core(value);
     let mut rewrite_context = RewriteStopsContext { stops, location };
 
@@ -176,7 +176,7 @@ pub fn parse_expression_to_tree(
     kind: &MdxExpressionKind,
     stops: &[Stop],
     location: Option<&Location>,
-) -> Result<Option<Box<Expr>>, String> {
+) -> Result<Option<Box<Expr>>, Error> {
     let result = parse_expression_core(value, kind);
     let mut rewrite_context = RewriteStopsContext { stops, location };
 
@@ -257,7 +257,7 @@ fn swc_error_to_signal(
 }
 
 /// Turn an SWC error into a flat error.
-fn swc_error_to_error(span: Span, reason: &str, context: &RewriteStopsContext) -> String {
+fn swc_error_to_error(span: Span, reason: &str, context: &RewriteStopsContext) -> Error {
     let point = context
         .location
         .and_then(|location| location.relative_to_point(context.stops, span.lo.to_usize()));
