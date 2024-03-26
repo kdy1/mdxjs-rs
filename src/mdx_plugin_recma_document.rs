@@ -84,7 +84,7 @@ pub fn mdx_plugin_recma_document(
     program: &mut Program,
     options: &Options,
     location: Option<&Location>,
-) -> Result<(), String> {
+) -> Result<(), Error> {
     // New body children.
     let mut replacements = vec![];
 
@@ -535,7 +535,7 @@ fn err_for_double_layout(
     layout: bool,
     previous: Option<&Position>,
     at: Option<&Point>,
-) -> Result<(), String> {
+) -> Result<(), Error> {
     if layout {
         Err(prefix_error_with_point(
             &format!(
@@ -619,7 +619,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn export() -> Result<(), String> {
+    fn export() -> Result<(), Error> {
         assert_eq!(
             compile("export * from 'a'\n\n# b")?,
             "export * from 'a';
@@ -667,7 +667,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn export_default() -> Result<(), String> {
+    fn export_default() -> Result<(), Error> {
         assert_eq!(
             compile("export default a")?,
             "const MDXLayout = a;
@@ -715,7 +715,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn named_exports() -> Result<(), String> {
+    fn named_exports() -> Result<(), Error> {
         assert_eq!(
             compile("export {a, b as default}")?,
             "export { a };
@@ -859,7 +859,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn statement_pass_through() -> Result<(), String> {
+    fn statement_pass_through() -> Result<(), Error> {
         let mut program = Program {
             path: None,
             comments: vec![],
@@ -896,7 +896,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn expression_pass_through() -> Result<(), String> {
+    fn expression_pass_through() -> Result<(), Error> {
         let mut program = Program {
             path: None,
             comments: vec![],
@@ -930,7 +930,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn fragment_non_element_single_child() -> Result<(), String> {
+    fn fragment_non_element_single_child() -> Result<(), Error> {
         let mut program = Program {
             path: None,
             comments: vec![],
@@ -976,7 +976,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn element() -> Result<(), String> {
+    fn element() -> Result<(), Error> {
         let mut program = Program {
             path: None,
             comments: vec![],
