@@ -249,7 +249,7 @@ impl<'a> State<'a> {
         &mut self,
         attributes: Option<Vec<JSXAttrOrSpread>>,
         children: Option<Vec<Expr>>,
-    ) -> Result<(Option<Expr>, Option<Expr>), String> {
+    ) -> Result<(Option<Expr>, Option<Expr>), Error> {
         let mut objects = vec![];
         let mut fields = vec![];
         let mut spread = false;
