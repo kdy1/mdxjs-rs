@@ -557,6 +557,7 @@ mod tests {
     use crate::mdx_plugin_recma_document::{mdx_plugin_recma_document, Options as DocumentOptions};
     use crate::swc::{parse_esm, parse_expression, serialize};
     use crate::swc_utils::create_bool_expression;
+    use crate::Error;
     use markdown::{to_mdast, ParseOptions};
     use pretty_assertions::assert_eq;
     use swc_core::ecma::ast::{
@@ -564,7 +565,7 @@ mod tests {
         JSXOpeningFragment, JSXText, Module, TsInterfaceBody, TsInterfaceDecl, WhileStmt,
     };
 
-    fn compile(value: &str) -> Result<String, String> {
+    fn compile(value: &str) -> Result<String, Error> {
         let location = Location::new(value.as_bytes());
         let mdast = to_mdast(
             value,
@@ -581,7 +582,7 @@ mod tests {
     }
 
     #[test]
-    fn small() -> Result<(), String> {
+    fn small() -> Result<(), Error> {
         assert_eq!(
             compile("# hi\n\nAlpha *bravo* **charlie**.")?,
             "function _createMdxContent(props) {
@@ -599,7 +600,7 @@ export default MDXContent;
     }
 
     #[test]
-    fn import() -> Result<(), String> {
+    fn import() -> Result<(), Error> {
         assert_eq!(
             compile("import a from 'b'\n\n# {a}")?,
             "import a from 'b';
