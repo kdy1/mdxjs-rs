@@ -9,6 +9,7 @@ use crate::swc_utils::{
     create_null_expression, create_object_expression, create_str, position_opt_to_string,
     prefix_error_with_point, span_to_position,
 };
+use crate::Error;
 use markdown::{
     unist::{Point, Position},
     Location,

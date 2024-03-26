@@ -360,7 +360,7 @@ fn transform_mdxjs_esm(
     context: &mut Context,
     _node: &hast::Node,
     esm: &hast::MdxjsEsm,
-) -> Result<Option<JSXElementChild>, String> {
+) -> Result<Option<JSXElementChild>, Error> {
     let mut module = parse_esm_to_tree(&esm.value, &esm.stops, context.location)?;
     context.esm.append(&mut module.body);
     Ok(None)
@@ -371,7 +371,7 @@ fn transform_root(
     context: &mut Context,
     node: &hast::Node,
     _root: &hast::Root,
-) -> Result<Option<JSXElementChild>, String> {
+) -> Result<Option<JSXElementChild>, Error> {
     let mut children = all(context, node)?;
     let mut queue = vec![];
     let mut nodes = vec![];
