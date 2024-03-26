@@ -7,6 +7,7 @@ use swc_core::common::Span;
 pub enum Error {
     Msg(String),
     Parser(Span, swc_core::ecma::parser::error::Error),
+    OnlyImportExport(Span),
 }
 
 impl From<String> for Error {
