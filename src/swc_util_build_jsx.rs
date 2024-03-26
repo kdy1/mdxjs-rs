@@ -796,7 +796,7 @@ mod tests {
     };
     use swc_core::ecma::parser::{parse_file_as_module, EsConfig, Syntax};
 
-    fn compile(value: &str, options: &Options) -> Result<String, String> {
+    fn compile(value: &str, options: &Options) -> Result<String, Error> {
         let location = Location::new(value.as_bytes());
         let mut errors = vec![];
         let comments = SingleThreadedComments::default();
@@ -832,7 +832,7 @@ mod tests {
     }
 
     #[test]
-    fn small_default() -> Result<(), String> {
+    fn small_default() -> Result<(), Error> {
         assert_eq!(
             compile("let a = <b />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\nlet a = _jsx(\"b\", {});\n",
@@ -843,7 +843,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_runtime_automatic() -> Result<(), String> {
+    fn directive_runtime_automatic() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime automatic */\nlet a = <b />",
@@ -857,7 +857,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_runtime_classic() -> Result<(), String> {
+    fn directive_runtime_classic() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime classic */\nlet a = <b />",
@@ -871,7 +871,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_runtime_empty() -> Result<(), String> {
+    fn directive_runtime_empty() -> Result<(), Error> {
         assert_eq!(
             compile("/* @jsxRuntime */\nlet a = <b />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\nlet a = _jsx(\"b\", {});\n",
@@ -896,7 +896,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_import_source() -> Result<(), String> {
+    fn directive_import_source() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxImportSource aaa */\nlet a = <b />",
@@ -910,7 +910,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_jsx() -> Result<(), String> {
+    fn directive_jsx() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime classic @jsx a */\nlet b = <c />",
@@ -924,7 +924,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_jsx_empty() -> Result<(), String> {
+    fn directive_jsx_empty() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime classic @jsx */\nlet a = <b />",
@@ -938,7 +938,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_jsx_non_identifier() -> Result<(), String> {
+    fn directive_jsx_non_identifier() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime classic @jsx a.b-c.d! */\n<x />",
@@ -952,7 +952,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_jsx_frag() -> Result<(), String> {
+    fn directive_jsx_frag() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime classic @jsxFrag a */\nlet b = <></>",
@@ -966,7 +966,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_jsx_frag_empty() -> Result<(), String> {
+    fn directive_jsx_frag_empty() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime classic @jsxFrag */\nlet a = <></>",
@@ -980,7 +980,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_non_first_line() -> Result<(), String> {
+    fn directive_non_first_line() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/*\n first line\n @jsxRuntime classic\n */\n<b />",
@@ -994,7 +994,7 @@ mod tests {
     }
 
     #[test]
-    fn directive_asterisked_line() -> Result<(), String> {
+    fn directive_asterisked_line() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/*\n * first line\n * @jsxRuntime classic\n */\n<b />",
@@ -1008,7 +1008,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_self_closing() -> Result<(), String> {
+    fn jsx_element_self_closing() -> Result<(), Error> {
         assert_eq!(
             compile("<a />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {});\n",
@@ -1019,7 +1019,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_self_closing_classic() -> Result<(), String> {
+    fn jsx_element_self_closing_classic() -> Result<(), Error> {
         assert_eq!(
             compile("/* @jsxRuntime classic */\n<a />", &Options::default())?,
             "React.createElement(\"a\");\n",
@@ -1030,7 +1030,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_closed() -> Result<(), String> {
+    fn jsx_element_closed() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "<a>b</a>",
@@ -1044,7 +1044,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_member_name() -> Result<(), String> {
+    fn jsx_element_member_name() -> Result<(), Error> {
         assert_eq!(
             compile("<a.b.c />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(a.b.c, {});\n",
@@ -1055,7 +1055,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_member_name_dashes() -> Result<(), String> {
+    fn jsx_element_member_name_dashes() -> Result<(), Error> {
         assert_eq!(
             compile("<a.b-c />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(a[\"b-c\"], {});\n",
@@ -1065,7 +1065,7 @@ mod tests {
         Ok(())
     }
     #[test]
-    fn jsx_element_member_name_many() -> Result<(), String> {
+    fn jsx_element_member_name_many() -> Result<(), Error> {
         assert_eq!(
             compile("<a.b.c.d />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(a.b.c.d, {});\n",
@@ -1076,7 +1076,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_namespace_name() -> Result<(), String> {
+    fn jsx_element_namespace_name() -> Result<(), Error> {
         assert_eq!(
             compile("<a:b />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a:b\", {});\n",
@@ -1087,7 +1087,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_name_dashes() -> Result<(), String> {
+    fn jsx_element_name_dashes() -> Result<(), Error> {
         assert_eq!(
             compile("<a-b />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a-b\", {});\n",
@@ -1098,7 +1098,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_name_capital() -> Result<(), String> {
+    fn jsx_element_name_capital() -> Result<(), Error> {
         assert_eq!(
             compile("<Abc />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(Abc, {});\n",
@@ -1109,7 +1109,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_boolean() -> Result<(), String> {
+    fn jsx_element_attribute_boolean() -> Result<(), Error> {
         assert_eq!(
             compile("<a b />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: true\n});\n",
@@ -1120,7 +1120,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_boolean_classic() -> Result<(), String> {
+    fn jsx_element_attribute_boolean_classic() -> Result<(), Error> {
         assert_eq!(
             compile("/* @jsxRuntime classic */\n<a b />", &Options::default())?,
             "React.createElement(\"a\", {\n    b: true\n});\n",
@@ -1131,7 +1131,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_name_namespace() -> Result<(), String> {
+    fn jsx_element_attribute_name_namespace() -> Result<(), Error> {
         assert_eq!(
             compile("<a b:c />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    \"b:c\": true\n});\n",
@@ -1142,7 +1142,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_name_non_identifier() -> Result<(), String> {
+    fn jsx_element_attribute_name_non_identifier() -> Result<(), Error> {
         assert_eq!(
             compile("<a b-c />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    \"b-c\": true\n});\n",
@@ -1153,7 +1153,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_value() -> Result<(), String> {
+    fn jsx_element_attribute_value() -> Result<(), Error> {
         assert_eq!(
             compile("<a b='c' />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: \"c\"\n});\n",
@@ -1164,7 +1164,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_value_expression() -> Result<(), String> {
+    fn jsx_element_attribute_value_expression() -> Result<(), Error> {
         assert_eq!(
             compile("<a b={c} />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: c\n});\n",
@@ -1175,7 +1175,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_value_fragment() -> Result<(), String> {
+    fn jsx_element_attribute_value_fragment() -> Result<(), Error> {
         assert_eq!(
             compile("<a b=<>c</> />", &Options::default())?,
             "import { Fragment as _Fragment, jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: _jsx(_Fragment, {\n        children: \"c\"\n    })\n});\n",
@@ -1186,7 +1186,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_attribute_value_element() -> Result<(), String> {
+    fn jsx_element_attribute_value_element() -> Result<(), Error> {
         assert_eq!(
             compile("<a b=<c /> />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: _jsx(\"c\", {})\n});\n",
@@ -1197,7 +1197,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_spread_attribute() -> Result<(), String> {
+    fn jsx_element_spread_attribute() -> Result<(), Error> {
         assert_eq!(
             compile("<a {...b} />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", b);\n",
@@ -1208,7 +1208,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_spread_attribute_then_prop() -> Result<(), String> {
+    fn jsx_element_spread_attribute_then_prop() -> Result<(), Error> {
         assert_eq!(
             compile("<a {...b} c />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({}, b, {\n    c: true\n}));\n",
@@ -1219,7 +1219,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_prop_then_spread_attribute() -> Result<(), String> {
+    fn jsx_element_prop_then_spread_attribute() -> Result<(), Error> {
         assert_eq!(
             compile("<a b {...c} />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({\n    b: true\n}, c));\n",
@@ -1230,7 +1230,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_two_spread_attributes() -> Result<(), String> {
+    fn jsx_element_two_spread_attributes() -> Result<(), Error> {
         assert_eq!(
             compile("<a {...b} {...c} />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({}, b, c));\n",
@@ -1241,7 +1241,7 @@ mod tests {
     }
 
     #[test]
-    fn jsx_element_complex_spread_attribute() -> Result<(), String> {
+    fn jsx_element_complex_spread_attribute() -> Result<(), Error> {
         assert_eq!(
             compile("<a {...{b:1,...c,d:2}} />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1258,7 +1258,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_expression() -> Result<(), String> {
+    fn jsx_element_child_expression() -> Result<(), Error> {
         assert_eq!(
             compile("<a>{1}</a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1273,7 +1273,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_expression_classic() -> Result<(), String> {
+    fn jsx_element_child_expression_classic() -> Result<(), Error> {
         assert_eq!(
             compile("/* @jsxRuntime classic */\n<a>{1}</a>", &Options::default())?,
             "React.createElement(\"a\", null, 1);\n",
@@ -1284,7 +1284,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_expression_empty() -> Result<(), String> {
+    fn jsx_element_child_expression_empty() -> Result<(), Error> {
         assert_eq!(
             compile("<a>{}</a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1297,7 +1297,7 @@ _jsx(\"a\", {});
     }
 
     #[test]
-    fn jsx_element_child_expression_empty_classic() -> Result<(), String> {
+    fn jsx_element_child_expression_empty_classic() -> Result<(), Error> {
         assert_eq!(
             compile("/* @jsxRuntime classic */\n<a>{}</a>", &Options::default())?,
             "React.createElement(\"a\");\n",
@@ -1308,7 +1308,7 @@ _jsx(\"a\", {});
     }
 
     #[test]
-    fn jsx_element_child_fragment() -> Result<(), String> {
+    fn jsx_element_child_fragment() -> Result<(), Error> {
         assert_eq!(
             compile("<a><>b</></a>", &Options::default())?,
             "import { Fragment as _Fragment, jsx as _jsx } from \"react/jsx-runtime\";
@@ -1366,7 +1366,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_text_padded_start() -> Result<(), String> {
+    fn jsx_element_child_text_padded_start() -> Result<(), Error> {
         assert_eq!(
             compile("<a>  b</a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1381,7 +1381,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_text_padded_end() -> Result<(), String> {
+    fn jsx_element_child_text_padded_end() -> Result<(), Error> {
         assert_eq!(
             compile("<a>b  </a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1396,7 +1396,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_text_padded() -> Result<(), String> {
+    fn jsx_element_child_text_padded() -> Result<(), Error> {
         assert_eq!(
             compile("<a>  b  </a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1411,7 +1411,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_text_line_endings_padded() -> Result<(), String> {
+    fn jsx_element_child_text_line_endings_padded() -> Result<(), Error> {
         assert_eq!(
             compile("<a> b \r c \n d \n </a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1426,7 +1426,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_text_blank_lines() -> Result<(), String> {
+    fn jsx_element_child_text_blank_lines() -> Result<(), Error> {
         assert_eq!(
             compile("<a> b \r \n c \n\n d \n </a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1441,7 +1441,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_child_whitespace_only() -> Result<(), String> {
+    fn jsx_element_child_whitespace_only() -> Result<(), Error> {
         assert_eq!(
             compile("<a> \t\n </a>", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1454,7 +1454,7 @@ _jsx(\"a\", {});
     }
 
     #[test]
-    fn jsx_element_key_automatic() -> Result<(), String> {
+    fn jsx_element_key_automatic() -> Result<(), Error> {
         assert_eq!(
             compile("<a b key='c' d />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1470,7 +1470,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_key_classic() -> Result<(), String> {
+    fn jsx_element_key_classic() -> Result<(), Error> {
         assert_eq!(
             compile(
                 "/* @jsxRuntime classic */\n<a b key='c' d />",
@@ -1499,7 +1499,7 @@ _jsx(\"a\", {
     }
 
     #[test]
-    fn jsx_element_key_before_spread_automatic() -> Result<(), String> {
+    fn jsx_element_key_before_spread_automatic() -> Result<(), Error> {
         assert_eq!(
             compile("<a key='b' {...c} />", &Options::default())?,
             "import { jsx as _jsx } from \"react/jsx-runtime\";
@@ -1512,7 +1512,7 @@ _jsx(\"a\", c, \"b\");
     }
 
     #[test]
-    fn jsx_element_development() -> Result<(), String> {
+    fn jsx_element_development() -> Result<(), Error> {
         assert_eq!(
             compile("<><a /></>", &Options { development: true })?,
             "import { Fragment as _Fragment, jsxDEV as _jsxDEV } from \"react/jsx-dev-runtime\";
