@@ -15,6 +15,11 @@ impl From<String> for Error {
         Error::Msg(value)
     }
 }
+impl From<&'_ str> for Error {
+    fn from(value: &'_ str) -> Self {
+        Error::Msg(value.to_string())
+    }
+}
 
 scoped_thread_local!(static ERROR: RefCell<Option<Error>>);
 
