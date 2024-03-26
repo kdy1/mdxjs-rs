@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use scoped_tls::scoped_thread_local;
 use swc_core::common::Span;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Error {
     Msg(String),
     Parser(Span, swc_core::ecma::parser::error::Error),
