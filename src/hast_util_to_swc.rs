@@ -678,7 +678,7 @@ mod tests {
     };
 
     #[test]
-    fn comments() -> Result<(), String> {
+    fn comments() -> Result<(), Error> {
         let mut comment_ast = hast_util_to_swc(
             &hast::Node::Comment(hast::Comment {
                 value: "a".into(),
@@ -734,7 +734,7 @@ mod tests {
     }
 
     #[test]
-    fn elements() -> Result<(), String> {
+    fn elements() -> Result<(), Error> {
         let mut element_ast = hast_util_to_swc(
             &hast::Node::Element(hast::Element {
                 tag_name: "a".into(),
@@ -844,7 +844,7 @@ mod tests {
     }
 
     #[test]
-    fn element_attributes() -> Result<(), String> {
+    fn element_attributes() -> Result<(), Error> {
         assert_eq!(
             serialize(
                 &mut hast_util_to_swc(
@@ -976,7 +976,7 @@ mod tests {
     }
 
     #[test]
-    fn mdx_element() -> Result<(), String> {
+    fn mdx_element() -> Result<(), Error> {
         let mut mdx_element_ast = hast_util_to_swc(
             &hast::Node::MdxJsxElement(hast::MdxJsxElement {
                 name: None,
@@ -1064,7 +1064,7 @@ mod tests {
     }
 
     #[test]
-    fn mdx_element_name() -> Result<(), String> {
+    fn mdx_element_name() -> Result<(), Error> {
         assert_eq!(
             serialize(
                 &mut hast_util_to_swc(
@@ -1126,7 +1126,7 @@ mod tests {
     }
 
     #[test]
-    fn mdx_element_attributes() -> Result<(), String> {
+    fn mdx_element_attributes() -> Result<(), Error> {
         assert_eq!(
             serialize(
                 &mut hast_util_to_swc(
@@ -1284,7 +1284,7 @@ mod tests {
     }
 
     #[test]
-    fn mdx_expression() -> Result<(), String> {
+    fn mdx_expression() -> Result<(), Error> {
         let mut mdx_expression_ast = hast_util_to_swc(
             &hast::Node::MdxExpression(hast::MdxExpression {
                 value: "a".into(),
@@ -1341,7 +1341,7 @@ mod tests {
     }
 
     #[test]
-    fn mdx_esm() -> Result<(), String> {
+    fn mdx_esm() -> Result<(), Error> {
         let mut mdxjs_esm_ast = hast_util_to_swc(
             &hast::Node::MdxjsEsm(hast::MdxjsEsm {
                 value: "import a from 'b'".into(),
@@ -1411,7 +1411,7 @@ mod tests {
     }
 
     #[test]
-    fn root() -> Result<(), String> {
+    fn root() -> Result<(), Error> {
         let mut root_ast = hast_util_to_swc(
             &hast::Node::Root(hast::Root {
                 children: vec![hast::Node::Text(hast::Text {
@@ -1467,7 +1467,7 @@ mod tests {
     }
 
     #[test]
-    fn text() -> Result<(), String> {
+    fn text() -> Result<(), Error> {
         let mut text_ast = hast_util_to_swc(
             &hast::Node::Text(hast::Text {
                 value: "a".into(),
@@ -1520,7 +1520,7 @@ mod tests {
     }
 
     #[test]
-    fn text_empty() -> Result<(), String> {
+    fn text_empty() -> Result<(), Error> {
         let text_ast = hast_util_to_swc(
             &hast::Node::Text(hast::Text {
                 value: String::new(),
@@ -1548,7 +1548,7 @@ mod tests {
     }
 
     #[test]
-    fn doctype() -> Result<(), String> {
+    fn doctype() -> Result<(), Error> {
         let mut doctype_ast = hast_util_to_swc(
             &hast::Node::Doctype(hast::Doctype { position: None }),
             None,
