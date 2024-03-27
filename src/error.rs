@@ -2,6 +2,7 @@ use std::{cell::RefCell, fmt::Display};
 
 use markdown::unist::Point;
 use scoped_tls::scoped_thread_local;
+use swc_core::common::Span;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Error {
@@ -14,8 +15,8 @@ pub enum ErrorKind {
     JsxSpreadNotSupported,
 
     // Msg(String),
-    Parser(swc_core::ecma::parser::error::Error),
-    OnlyImportExport,
+    Parser(Span, swc_core::ecma::parser::error::Error),
+    OnlyImportExport(Span),
 }
 
 impl From<ErrorKind> for Error {
@@ -38,12 +39,6 @@ impl From<ErrorKind> for Error {
 //     }
 // }
 
-impl From<swc_core::ecma::parser::error::Error> for Error {
-    fn from(value: swc_core::ecma::parser::error::Error) -> Self {
-        Self::from(ErrorKind::Parser(value))
-    }
-}
-
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(point) = &self.point {
@@ -57,8 +52,8 @@ impl Display for Error {
                 f,
                 "Unexpected spread child, which is not supported in Babel, SWC, or React"
             )?,
-            ErrorKind::Parser(err) => write!(f, "{}", err.kind().msg())?,
-            ErrorKind::OnlyImportExport => write!(f, "Only import and export are supported")?,
+            ErrorKind::Parser(_, err) => write!(f, "{}", err.kind().msg())?,
+            ErrorKind::OnlyImportExport(..) => write!(f, "Only import and export are supported")?,
         }
         Ok(())
     }

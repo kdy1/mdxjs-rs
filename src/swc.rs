@@ -3,6 +3,7 @@
 extern crate markdown;
 
 use crate::{
+    error::ErrorKind,
     swc_utils::{
         create_span, prefix_error_with_point, DropContext, RewritePrefixContext,
         RewriteStopsContext,
@@ -67,7 +68,7 @@ fn parse_esm_core(value: &str) -> Result<Module, Error> {
                     let node = &module.body[index];
 
                     if !node.is_module_decl() {
-                        return Err(Error::OnlyImportExport(fix_span(node.span(), 1)));
+                        return Err(ErrorKind::OnlyImportExport(fix_span(node.span(), 1)));
                     }
 
                     index += 1;
@@ -165,7 +166,7 @@ pub fn parse_expression(value: &str, kind: &MdxExpressionKind) -> MdxSignal {
     let result = parse_expression_core(value, kind);
 
     match result {
-        Err((span, message)) => swc_error_to_signal(span, &message, value.len()),
+        Err((span, message)) => swc_error_to_signal(span, message, value.len()),
         Ok(_) => MdxSignal::Ok,
     }
 }
@@ -240,11 +241,7 @@ pub fn flat_comments(single_threaded_comments: SingleThreadedComments) -> Vec<Co
 ///
 /// * If the error happens at `value_len`, yields `MdxSignal::Eof`
 /// * Else, yields `MdxSignal::Error`.
-fn swc_error_to_signal(
-    span: Span,
-    reason: swc_core::ecma::parser::error::Error,
-    value_len: usize,
-) -> MdxSignal {
+fn swc_error_to_signal(span: Span, reason: Error, value_len: usize) -> MdxSignal {
     let error_end = span.hi.to_usize();
 
     if error_end >= value_len {
