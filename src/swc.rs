@@ -141,12 +141,7 @@ fn parse_expression_core(
                         }
                     };
 
-                    return Err((
-                        expr_span,
-                        "Unexpected prop in spread (such as `{x}`): only a spread is supported \
-                         (such as `{...x}`)"
-                            .into(),
-                    ));
+                    return Err((expr_span, ErrorKind::UnexpectedPropertyInSpread.into()));
                 }
 
                 Ok(Some(expr))

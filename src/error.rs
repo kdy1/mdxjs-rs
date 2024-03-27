@@ -19,6 +19,7 @@ pub enum ErrorKind {
     CannotExportTsInterfaceAsDefault,
     CannotSpecifyMultipleLayouts { previous: Option<Position> },
     UnexpectedExtraContentInSpread,
+    UnexpectedPropertyInSpread,
 
     // Msg(String),
     Parser(swc_core::ecma::parser::error::Error),
@@ -83,6 +84,12 @@ impl Display for Error {
                 f,
                 "Unexpected extra content in spread (such as `{{...x,y}}`): only a single spread \
                  is supported (such as `{{...x}}`)"
+            )?,
+
+            ErrorKind::UnexpectedPropertyInSpread => write!(
+                f,
+                "Unexpected prop in spread (such as `{{x}}`): only a spread is supported (such as \
+                 `{{...x}}`)"
             )?,
 
             ErrorKind::Parser(err) => write!(f, "{}", err.kind().msg())?,
