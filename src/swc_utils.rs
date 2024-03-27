@@ -80,8 +80,9 @@ pub fn bytepos_to_point(bytepos: BytePos, location: Option<&Location>) -> Option
 }
 
 /// Prefix an error message with an optional point.
-pub fn prefix_error_with_point(reason: Error, point: Option<&Point>) -> Error {
-    format!("{}: {}", point_opt_to_string(point), reason)
+pub fn prefix_error_with_point(mut reason: Error, point: Option<&Point>) -> Error {
+    reason.point = point.cloned();
+    reason
 }
 
 /// Serialize a unist position for humans.
