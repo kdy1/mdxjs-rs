@@ -12,6 +12,8 @@ pub struct Error {
 #[derive(Debug, Clone, PartialEq)]
 pub enum ErrorKind {
     JsxSpreadNotSupported,
+    UnexpectedContentAfterExpr,
+    CannotExportTsInterfaceAsDefault,
 
     // Msg(String),
     Parser(swc_core::ecma::parser::error::Error),
@@ -57,6 +59,13 @@ impl Display for Error {
                 f,
                 "Unexpected spread child, which is not supported in Babel, SWC, or React"
             )?,
+            ErrorKind::UnexpectedContentAfterExpr => write!(
+                f,
+                "Could not parse expression with swc: Unexpected content after expression"
+            )?,
+            ErrorKind::CannotExportTsInterfaceAsDefault=>
+                write!(f, "Cannot use TypeScript interface declarations as default export in MDX files. The default export is reserved for a layout, which must be a component")?,
+
             ErrorKind::Parser(err) => write!(f, "{}", err.kind().msg())?,
             ErrorKind::OnlyImportExport => write!(f, "Only import and export are supported")?,
         }

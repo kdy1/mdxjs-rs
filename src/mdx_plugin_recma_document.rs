@@ -3,6 +3,7 @@
 //! Port of <https://github.com/mdx-js/mdx/blob/main/packages/mdx/lib/plugin/recma-document.js>,
 //! by the same author.
 
+use crate::error::ErrorKind;
 use crate::hast_util_to_swc::Program;
 use crate::swc_utils::{
     bytepos_to_point, create_call_expression, create_ident, create_ident_expression,
@@ -200,12 +201,10 @@ pub fn mdx_plugin_recma_document(
                         replacements.push(create_layout_decl(Expr::Fn(func)));
                     }
                     DefaultDecl::TsInterfaceDecl(_) => {
-                        return Err(
-                            prefix_error_with_point(
-                                "Cannot use TypeScript interface declarations as default export in MDX files. The default export is reserved for a layout, which must be a component",
-                                bytepos_to_point(decl.span.lo, location).as_ref()
-                            )
-                        );
+                        return Err(prefix_error_with_point(
+                            ErrorKind::CannotExportTsInterfaceAsDefault.into(),
+                            bytepos_to_point(decl.span.lo, location).as_ref(),
+                        ));
                     }
                 }
             }

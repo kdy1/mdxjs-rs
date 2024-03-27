@@ -307,6 +307,7 @@ fn whitespace_and_comments(mut index: usize, value: &str) -> Result<(), (Span, E
         else {
             return Err((
                 create_span(index as u32, value.len() as u32),
+                ErrorKind::UnexpectedContentAfterExpr,
                 "Could not parse expression with swc: Unexpected content after expression".into(),
             ));
         }
