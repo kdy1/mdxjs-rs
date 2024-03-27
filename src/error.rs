@@ -16,6 +16,12 @@ pub enum ErrorKind {
     OnlyImportExport,
 }
 
+impl From<ErrorKind> for Error {
+    fn from(kind: ErrorKind) -> Self {
+        Error { kind, point: None }
+    }
+}
+
 // impl From<String> for Error {
 //     fn from(value: String) -> Self {
 //         Error {
@@ -32,10 +38,7 @@ pub enum ErrorKind {
 
 impl From<swc_core::ecma::parser::error::Error> for Error {
     fn from(value: swc_core::ecma::parser::error::Error) -> Self {
-        Error {
-            kind: ErrorKind::Parser(value),
-            point: None,
-        }
+        Self::from(ErrorKind::Parser(value))
     }
 }
 

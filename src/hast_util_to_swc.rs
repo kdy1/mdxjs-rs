@@ -1276,7 +1276,7 @@ mod tests {
                 None,
                 None
             ),
-            Err("0:0: Unexpected extra content in spread (such as `{...x,y}`): only a single spread is supported (such as `{...x}`)".into()),
+            Err("0:0: Unexpected extra content in spread (such as `{...x,y}`): only a single spread is supported (such as `{...x}`)"),
             "should support an `MdxElement` (element, broken expression attribute)",
         );
 
