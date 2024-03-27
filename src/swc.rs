@@ -87,7 +87,7 @@ fn parse_esm_core(value: &str) -> Result<Module, Error> {
 fn parse_expression_core(
     value: &str,
     kind: &MdxExpressionKind,
-) -> Result<Option<Box<Expr>>, (Span, String)> {
+) -> Result<Option<Box<Expr>>, (Span, Error)> {
     // Empty expressions are OK.
     if matches!(kind, MdxExpressionKind::Expression) && whitespace_and_comments(0, value).is_ok() {
         return Ok(None);
@@ -250,14 +250,14 @@ fn swc_error_to_signal(
     if error_end >= value_len {
         MdxSignal::Eof(reason.into())
     } else {
-        crate::error::set_error(crate::Error::Parser(span, reason.into()));
+        crate::error::set_error(crate::Error::from(reason));
 
         MdxSignal::Error(String::new(), span.lo.to_usize())
     }
 }
 
 /// Turn an SWC error into a flat error.
-fn swc_error_to_error(span: Span, reason: &str, context: &RewriteStopsContext) -> Error {
+fn swc_error_to_error(span: Span, reason: Error, context: &RewriteStopsContext) -> Error {
     let point = context
         .location
         .and_then(|location| location.relative_to_point(context.stops, span.lo.to_usize()));
@@ -275,7 +275,7 @@ fn swc_error_to_string(error: &SwcError) -> String {
 /// This is needed because for expressions, we use an API that parses up to
 /// a valid expression, but there may be more expressions after it, which we
 /// don’t alow.
-fn whitespace_and_comments(mut index: usize, value: &str) -> Result<(), (Span, String)> {
+fn whitespace_and_comments(mut index: usize, value: &str) -> Result<(), (Span, Error)> {
     let bytes = value.as_bytes();
     let len = bytes.len();
     let mut in_multiline = false;

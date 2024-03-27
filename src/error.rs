@@ -11,24 +11,24 @@ pub struct Error {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ErrorKind {
-    Msg(String),
+    // Msg(String),
     Parser(swc_core::ecma::parser::error::Error),
     OnlyImportExport,
 }
 
-impl From<String> for Error {
-    fn from(value: String) -> Self {
-        Error {
-            kind: ErrorKind::Msg(value),
-            point: None,
-        }
-    }
-}
-impl From<&'_ str> for Error {
-    fn from(value: &'_ str) -> Self {
-        Self::from(value.to_string())
-    }
-}
+// impl From<String> for Error {
+//     fn from(value: String) -> Self {
+//         Error {
+//             kind: ErrorKind::Msg(value),
+//             point: None,
+//         }
+//     }
+// }
+// impl From<&'_ str> for Error {
+//     fn from(value: &'_ str) -> Self {
+//         Self::from(value.to_string())
+//     }
+// }
 
 impl From<swc_core::ecma::parser::error::Error> for Error {
     fn from(value: swc_core::ecma::parser::error::Error) -> Self {
