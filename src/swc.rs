@@ -129,7 +129,10 @@ fn parse_expression_core(
                     if let Expr::Paren(d) = *expr {
                         if let Expr::Object(mut obj) = *d.expr {
                             if obj.props.len() > 1 {
-                                return Err((obj.span, "Unexpected extra content in spread (such as `{...x,y}`): only a single spread is supported (such as `{...x}`)".into()));
+                                return Err((
+                                    obj.span,
+                                    ErrorKind::UnexpectedExtraContentInSpread.into(),
+                                ));
                             }
 
                             if let Some(PropOrSpread::Spread(d)) = obj.props.pop() {
@@ -140,7 +143,9 @@ fn parse_expression_core(
 
                     return Err((
                         expr_span,
-                        "Unexpected prop in spread (such as `{x}`): only a spread is supported (such as `{...x}`)".into(),
+                        "Unexpected prop in spread (such as `{x}`): only a spread is supported \
+                         (such as `{...x}`)"
+                            .into(),
                     ));
                 }
 
@@ -313,13 +318,22 @@ fn whitespace_and_comments(mut index: usize, value: &str) -> Result<(), (Span, E
 
     if in_multiline {
         return Err((
-            create_span(index as u32, value.len() as u32), "Could not parse expression with swc: Unexpected unclosed multiline comment, expected closing: `*/`".into()));
+            create_span(index as u32, value.len() as u32),
+            "Could not parse expression with swc: Unexpected unclosed multiline comment, expected \
+             closing: `*/`"
+                .into(),
+        ));
     }
 
     if in_line {
         // EOF instead of EOL is specifically not allowed, because that would
         // mean the closing brace is on the commented-out line
-        return Err((create_span(index as u32, value.len() as u32), "Could not parse expression with swc: Unexpected unclosed line comment, expected line ending: `\\n`".into()));
+        return Err((
+            create_span(index as u32, value.len() as u32),
+            "Could not parse expression with swc: Unexpected unclosed line comment, expected line \
+             ending: `\\n`"
+                .into(),
+        ));
     }
 
     Ok(())

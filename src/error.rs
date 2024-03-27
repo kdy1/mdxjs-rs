@@ -12,11 +12,13 @@ pub struct Error {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[non_exhaustive]
 pub enum ErrorKind {
     JsxSpreadNotSupported,
     UnexpectedContentAfterExpr,
     CannotExportTsInterfaceAsDefault,
     CannotSpecifyMultipleLayouts { previous: Option<Position> },
+    UnexpectedExtraContentInSpread,
 
     // Msg(String),
     Parser(swc_core::ecma::parser::error::Error),
@@ -68,12 +70,19 @@ impl Display for Error {
             )?,
             ErrorKind::CannotExportTsInterfaceAsDefault => write!(
                 f,
-                "Cannot use TypeScript interface declarations as default export in MDX files. The default export is reserved for a layout, which must be a component"
+                "Cannot use TypeScript interface declarations as default export in MDX files. The \
+                 default export is reserved for a layout, which must be a component"
             )?,
             ErrorKind::CannotSpecifyMultipleLayouts { previous } => write!(
                 f,
                 "Cannot specify multiple layouts (previous: {})",
                 position_opt_to_string(previous.as_ref())
+            )?,
+
+            ErrorKind::UnexpectedExtraContentInSpread => write!(
+                f,
+                "Unexpected extra content in spread (such as `{{...x,y}}`): only a single spread \
+                 is supported (such as `{{...x}}`)"
             )?,
 
             ErrorKind::Parser(err) => write!(f, "{}", err.kind().msg())?,
