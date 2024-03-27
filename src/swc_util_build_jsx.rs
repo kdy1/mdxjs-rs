@@ -1,5 +1,6 @@
 //! Turn JSX into function calls.
 
+use crate::error::ErrorKind;
 use crate::hast_util_to_swc::Program;
 use crate::mdx_plugin_recma_document::JsxRuntime;
 use crate::swc_utils::{
@@ -215,10 +216,8 @@ impl<'a> State<'a> {
                 JSXElementChild::JSXSpreadChild(child) => {
                     let lo = child.span.lo;
                     let start = bytepos_to_point(lo, self.location);
-                    let reason = prefix_error_with_point(
-                        "Unexpected spread child, which is not supported in Babel, SWC, or React",
-                        start.as_ref(),
-                    );
+                    let reason =
+                        prefix_error_with_point(ErrorKind::JsxSpreadNotSupported, start.as_ref());
                     return Err(reason);
                 }
                 JSXElementChild::JSXExprContainer(container) => {

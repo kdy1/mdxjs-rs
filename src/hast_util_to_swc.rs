@@ -1238,8 +1238,9 @@ mod tests {
                 }),
                 None,
                 None
-            ),
-            Err("0:0: Could not parse expression with swc: Unexpected eof".into()),
+            )
+            .map_err(|v| v.to_string()),
+            Err("0:0: Could not parse expression with swc: Unexpected eof".to_string()),
             "should support an `MdxElement` (element, attribute w/ broken expression value)",
         );
 
@@ -1275,8 +1276,8 @@ mod tests {
                 }),
                 None,
                 None
-            ),
-            Err("0:0: Unexpected extra content in spread (such as `{...x,y}`): only a single spread is supported (such as `{...x}`)"),
+            ).map_err(|v| v.to_string()),
+            Err("0:0: Unexpected extra content in spread (such as `{...x,y}`): only a single spread is supported (such as `{...x}`)".to_string()),
             "should support an `MdxElement` (element, broken expression attribute)",
         );
 
@@ -1399,10 +1400,11 @@ mod tests {
                 }),
                 None,
                 None
-            ),
+            )
+            .map_err(|v| v.to_string()),
             Err(
                 "0:0: Could not parse esm with swc: Expected 'from', got 'numeric literal (1, 1)'"
-                    .into()
+                    .to_string()
             ),
             "should support an `MdxjsEsm` (w/ broken content)",
         );
