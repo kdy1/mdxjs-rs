@@ -110,10 +110,7 @@ fn parse_expression_core(
     match result {
         Err(error) => Err((
             fix_span(error.span(), prefix.len() + 1),
-            format!(
-                "Could not parse expression with swc: {}",
-                swc_error_to_string(&error)
-            ),
+            Error::from(ErrorKind::Parser(error)),
         )),
         Ok(mut expr) => {
             if errors.is_empty() {
