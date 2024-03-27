@@ -216,8 +216,10 @@ impl<'a> State<'a> {
                 JSXElementChild::JSXSpreadChild(child) => {
                     let lo = child.span.lo;
                     let start = bytepos_to_point(lo, self.location);
-                    let reason =
-                        prefix_error_with_point(ErrorKind::JsxSpreadNotSupported, start.as_ref());
+                    let reason = prefix_error_with_point(
+                        ErrorKind::JsxSpreadNotSupported.into(),
+                        start.as_ref(),
+                    );
                     return Err(reason);
                 }
                 JSXElementChild::JSXExprContainer(container) => {
@@ -613,7 +615,7 @@ impl<'a> VisitMut for State<'a> {
 fn find_directives(
     comments: &Vec<Comment>,
     location: Option<&Location>,
-) -> Result<Directives, String> {
+) -> Result<Directives, Error> {
     let mut directives = Directives::default();
 
     for comment in comments {
@@ -817,7 +819,7 @@ mod tests {
         );
 
         match result {
-            Err(error) => Err(error.kind().msg().into()),
+            Err(error) => Err(error.into()),
             Ok(module) => {
                 let mut program = Program {
                     path: Some("example.jsx".into()),
@@ -888,7 +890,8 @@ mod tests {
                 &Options::default()
             )
             .err()
-            .unwrap(),
+            .unwrap()
+            .to_string(),
             "1:1: Runtime must be either `automatic` or `classic`, not unknown",
             "should crash on a non-automatic, non-classic `@jsxRuntime` directive"
         );
@@ -1365,7 +1368,8 @@ _jsx(\"a\", {
         assert_eq!(
             swc_util_build_jsx(&mut program, &Options::default(), None)
                 .err()
-                .unwrap(),
+                .unwrap()
+                .to_string(),
             "0:0: Unexpected spread child, which is not supported in Babel, SWC, or React",
             "should not support a spread child"
         );
