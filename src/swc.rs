@@ -148,10 +148,7 @@ fn parse_expression_core(
             } else {
                 Err((
                     fix_span(errors[0].span(), prefix.len() + 1),
-                    format!(
-                        "Could not parse expression with swc: {}",
-                        swc_error_to_string(&errors[0])
-                    ),
+                    Error::from(ErrorKind::Parser(errors[0].clone())),
                 ))
             }
         }
@@ -179,7 +176,7 @@ pub fn parse_expression_to_tree(
     let mut rewrite_context = RewriteStopsContext { stops, location };
 
     match result {
-        Err((span, reason)) => Err(swc_error_to_error(span, &reason, &rewrite_context)),
+        Err((span, reason)) => Err(swc_error_to_error(span, reason, &rewrite_context)),
         Ok(expr_opt) => {
             if let Some(mut expr) = expr_opt {
                 expr.visit_mut_with(&mut rewrite_context);
@@ -307,8 +304,7 @@ fn whitespace_and_comments(mut index: usize, value: &str) -> Result<(), (Span, E
         else {
             return Err((
                 create_span(index as u32, value.len() as u32),
-                ErrorKind::UnexpectedContentAfterExpr,
-                "Could not parse expression with swc: Unexpected content after expression".into(),
+                ErrorKind::UnexpectedContentAfterExpr.into(),
             ));
         }
 
