@@ -1031,11 +1031,9 @@ mod tests {
     #[test]
     fn jsx_element_closed() -> Result<(), Error> {
         assert_eq!(
-            compile(
-                "<a>b</a>",
-                &Options::default()
-            )?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    children: \"b\"\n});\n",
+            compile("<a>b</a>", &Options::default())?,
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    children: \
+             \"b\"\n});\n",
             "should support a closed element"
         );
 
@@ -1133,7 +1131,8 @@ mod tests {
     fn jsx_element_attribute_name_namespace() -> Result<(), Error> {
         assert_eq!(
             compile("<a b:c />", &Options::default())?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    \"b:c\": true\n});\n",
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    \"b:c\": \
+             true\n});\n",
             "should support an element with colons in an attribute name"
         );
 
@@ -1144,7 +1143,8 @@ mod tests {
     fn jsx_element_attribute_name_non_identifier() -> Result<(), Error> {
         assert_eq!(
             compile("<a b-c />", &Options::default())?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    \"b-c\": true\n});\n",
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    \"b-c\": \
+             true\n});\n",
             "should support an element with non-identifier characters in an attribute name"
         );
 
@@ -1155,7 +1155,8 @@ mod tests {
     fn jsx_element_attribute_value() -> Result<(), Error> {
         assert_eq!(
             compile("<a b='c' />", &Options::default())?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: \"c\"\n});\n",
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: \
+             \"c\"\n});\n",
             "should support an element with an attribute with a value"
         );
 
@@ -1177,7 +1178,9 @@ mod tests {
     fn jsx_element_attribute_value_fragment() -> Result<(), Error> {
         assert_eq!(
             compile("<a b=<>c</> />", &Options::default())?,
-            "import { Fragment as _Fragment, jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: _jsx(_Fragment, {\n        children: \"c\"\n    })\n});\n",
+            "import { Fragment as _Fragment, jsx as _jsx } from \
+             \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: _jsx(_Fragment, {\n        children: \
+             \"c\"\n    })\n});\n",
             "should support an element with an attribute with a fragment as value"
         );
 
@@ -1188,7 +1191,8 @@ mod tests {
     fn jsx_element_attribute_value_element() -> Result<(), Error> {
         assert_eq!(
             compile("<a b=<c /> />", &Options::default())?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: _jsx(\"c\", {})\n});\n",
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", {\n    b: \
+             _jsx(\"c\", {})\n});\n",
             "should support an element with an attribute with an element as value"
         );
 
@@ -1210,7 +1214,8 @@ mod tests {
     fn jsx_element_spread_attribute_then_prop() -> Result<(), Error> {
         assert_eq!(
             compile("<a {...b} c />", &Options::default())?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({}, b, {\n    c: true\n}));\n",
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({}, b, \
+             {\n    c: true\n}));\n",
             "should support an element with a spread attribute and then a prop"
         );
 
@@ -1221,7 +1226,8 @@ mod tests {
     fn jsx_element_prop_then_spread_attribute() -> Result<(), Error> {
         assert_eq!(
             compile("<a b {...c} />", &Options::default())?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({\n    b: true\n}, c));\n",
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({\n    \
+             b: true\n}, c));\n",
             "should support an element with a prop and then a spread attribute"
         );
 
@@ -1232,7 +1238,8 @@ mod tests {
     fn jsx_element_two_spread_attributes() -> Result<(), Error> {
         assert_eq!(
             compile("<a {...b} {...c} />", &Options::default())?,
-            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({}, b, c));\n",
+            "import { jsx as _jsx } from \"react/jsx-runtime\";\n_jsx(\"a\", Object.assign({}, b, \
+             c));\n",
             "should support an element two spread attributes"
         );
 
@@ -1491,7 +1498,8 @@ _jsx(\"a\", {
         assert_eq!(
             compile("<a {...b} key='c' />", &Options::default())
                 .err()
-                .unwrap(),
+                .unwrap()
+                .to_string(),
             "1:11: Expected `key` to come before any spread expressions",
             "should crash on a key after a spread in the automatic runtime"
         );

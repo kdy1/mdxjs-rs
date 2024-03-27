@@ -54,13 +54,13 @@ pub fn parse_esm_to_tree(
 }
 
 /// Core to parse ESM.
-fn parse_esm_core(value: &str) -> Result<Module, Error> {
+fn parse_esm_core(value: &str) -> Result<Module, (Span, Error)> {
     let (file, syntax, version) = create_config(value.into());
     let mut errors = vec![];
     let result = parse_file_as_module(&file, syntax, version, None, &mut errors);
 
     match result {
-        Err(error) => Err(Error::Parser(fix_span(error.span(), 1), error)),
+        Err(error) => Err((fix_span(error.span(), 1), Error::from(error))),
         Ok(module) => {
             if errors.is_empty() {
                 let mut index = 0;
@@ -68,7 +68,7 @@ fn parse_esm_core(value: &str) -> Result<Module, Error> {
                     let node = &module.body[index];
 
                     if !node.is_module_decl() {
-                        return Err(ErrorKind::OnlyImportExport(fix_span(node.span(), 1)));
+                        return Err((fix_span(node.span(), 1), ErrorKind::OnlyImportExport.into()));
                     }
 
                     index += 1;
@@ -76,9 +76,9 @@ fn parse_esm_core(value: &str) -> Result<Module, Error> {
 
                 Ok(module)
             } else {
-                Err(Error::Parser(
+                Err((
                     fix_span(errors[0].span(), 1),
-                    errors[0].clone(),
+                    Error::from(errors[0].clone()),
                 ))
             }
         }

@@ -539,8 +539,9 @@ fn err_for_double_layout(
     if layout {
         Err(prefix_error_with_point(
             ErrorKind::CannotSpecifyMultipleLayouts {
-                previous: previous.copied(),
-            },
+                previous: previous.cloned(),
+            }
+            .into(),
             at,
         ))
     } else {
@@ -585,10 +586,12 @@ mod tests {
         assert_eq!(
             compile("# hi\n\nAlpha *bravo* **charlie**.")?,
             "function _createMdxContent(props) {
-    return <><h1>{\"hi\"}</h1>{\"\\n\"}<p>{\"Alpha \"}<em>{\"bravo\"}</em>{\" \"}<strong>{\"charlie\"}</strong>{\".\"}</p></>;
+    return <><h1>{\"hi\"}</h1>{\"\\n\"}<p>{\"Alpha \"}<em>{\"bravo\"}</em>{\" \
+             \"}<strong>{\"charlie\"}</strong>{\".\"}</p></>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -607,7 +610,8 @@ function _createMdxContent(props) {
     return <h1>{a}</h1>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -626,12 +630,13 @@ function _createMdxContent(props) {
     return <h1>{\"b\"}</h1>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
-        "should support an export all",
-    );
+            "should support an export all",
+        );
 
         assert_eq!(
             compile("export function a() {}")?,
@@ -640,7 +645,8 @@ function _createMdxContent(props) {
     return <></>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -655,7 +661,8 @@ function _createMdxContent(props) {
     return <></>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -737,7 +744,8 @@ function _createMdxContent(props) {
     return <></>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -751,7 +759,8 @@ function _createMdxContent(props) {
     return <></>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -780,7 +789,8 @@ function _createMdxContent(props) {
     return <></>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -794,7 +804,8 @@ function _createMdxContent(props) {
     return <></>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -826,34 +837,32 @@ export default MDXContent;
                     module: Module {
                         span: swc_core::common::DUMMY_SP,
                         shebang: None,
-                        body: vec![ModuleItem::ModuleDecl(
-                            ModuleDecl::ExportDefaultDecl(
-                                ExportDefaultDecl {
+                        body: vec![ModuleItem::ModuleDecl(ModuleDecl::ExportDefaultDecl(
+                            ExportDefaultDecl {
+                                span: swc_core::common::DUMMY_SP,
+                                decl: DefaultDecl::TsInterfaceDecl(Box::new(TsInterfaceDecl {
                                     span: swc_core::common::DUMMY_SP,
-                                    decl: DefaultDecl::TsInterfaceDecl(Box::new(
-                                        TsInterfaceDecl {
-                                            span: swc_core::common::DUMMY_SP,
-                                            id: create_ident("a"),
-                                            declare: true,
-                                            type_params: None,
-                                            extends: vec![],
-                                            body: TsInterfaceBody {
-                                                span: swc_core::common::DUMMY_SP,
-                                                body: vec![]
-                                            }
-                                        }
-                                    ))
-                                }
-                            )
-                        )]
+                                    id: create_ident("a"),
+                                    declare: true,
+                                    type_params: None,
+                                    extends: vec![],
+                                    body: TsInterfaceBody {
+                                        span: swc_core::common::DUMMY_SP,
+                                        body: vec![]
+                                    }
+                                }))
+                            }
+                        ))]
                     }
                 },
                 &Options::default(),
                 None
             )
             .err()
-            .unwrap().to_string(),
-            "0:0: Cannot use TypeScript interface declarations as default export in MDX files. The default export is reserved for a layout, which must be a component",
+            .unwrap()
+            .to_string(),
+            "0:0: Cannot use TypeScript interface declarations as default export in MDX files. \
+             The default export is reserved for a layout, which must be a component",
             "should crash on a TypeScript default interface declaration"
         );
     }
@@ -885,7 +894,8 @@ function _createMdxContent(props) {
     return null;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -919,7 +929,8 @@ function _createMdxContent(props) {
     return null;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -965,7 +976,8 @@ export default MDXContent;
     return <>a</>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
@@ -1016,7 +1028,8 @@ export default MDXContent;
     return <a>b</a>;
 }
 function MDXContent(props = {}) {
-    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : _createMdxContent(props);
+    return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props}/></MDXLayout> : \
+             _createMdxContent(props);
 }
 export default MDXContent;
 ",
