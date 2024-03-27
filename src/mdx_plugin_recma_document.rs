@@ -538,10 +538,9 @@ fn err_for_double_layout(
 ) -> Result<(), Error> {
     if layout {
         Err(prefix_error_with_point(
-            &format!(
-                "Cannot specify multiple layouts (previous: {})",
-                position_opt_to_string(previous)
-            ),
+            ErrorKind::CannotSpecifyMultipleLayouts {
+                previous: previous.copied(),
+            },
             at,
         ))
     } else {

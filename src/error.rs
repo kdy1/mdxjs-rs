@@ -1,7 +1,9 @@
 use std::{cell::RefCell, fmt::Display};
 
-use markdown::unist::Point;
+use markdown::unist::{Point, Position};
 use scoped_tls::scoped_thread_local;
+
+use crate::swc_utils::position_opt_to_string;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Error {
@@ -14,6 +16,7 @@ pub enum ErrorKind {
     JsxSpreadNotSupported,
     UnexpectedContentAfterExpr,
     CannotExportTsInterfaceAsDefault,
+    CannotSpecifyMultipleLayouts { previous: Option<Position> },
 
     // Msg(String),
     Parser(swc_core::ecma::parser::error::Error),
@@ -63,8 +66,15 @@ impl Display for Error {
                 f,
                 "Could not parse expression with swc: Unexpected content after expression"
             )?,
-            ErrorKind::CannotExportTsInterfaceAsDefault=>
-                write!(f, "Cannot use TypeScript interface declarations as default export in MDX files. The default export is reserved for a layout, which must be a component")?,
+            ErrorKind::CannotExportTsInterfaceAsDefault => write!(
+                f,
+                "Cannot use TypeScript interface declarations as default export in MDX files. The default export is reserved for a layout, which must be a component"
+            )?,
+            ErrorKind::CannotSpecifyMultipleLayouts { previous } => write!(
+                f,
+                "Cannot specify multiple layouts (previous: {})",
+                position_opt_to_string(previous.as_ref())
+            )?,
 
             ErrorKind::Parser(err) => write!(f, "{}", err.kind().msg())?,
             ErrorKind::OnlyImportExport => write!(f, "Only import and export are supported")?,
