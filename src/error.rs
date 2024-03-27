@@ -1,23 +1,32 @@
 use std::cell::RefCell;
 
+use markdown::unist::Point;
 use scoped_tls::scoped_thread_local;
-use swc_core::common::Span;
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum Error {
+pub struct Error {
+    pub kind: ErrorKind,
+    pub point: Option<Point>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ErrorKind {
     Msg(String),
-    Parser(Span, swc_core::ecma::parser::error::Error),
-    OnlyImportExport(Span),
+    Parser(swc_core::ecma::parser::error::SyntaxError),
+    OnlyImportExport,
 }
 
 impl From<String> for Error {
     fn from(value: String) -> Self {
-        Error::Msg(value)
+        Error {
+            kind: ErrorKind::Msg(value),
+            point: None,
+        }
     }
 }
 impl From<&'_ str> for Error {
     fn from(value: &'_ str) -> Self {
-        Error::Msg(value.to_string())
+        Self::from(value.to_string())
     }
 }
 
