@@ -1288,7 +1288,7 @@ mod tests {
             .err()
             .unwrap()
             .to_string(),
-            "Could not parse expression with swc: Unexpected eof (mdxjs-rs:swc)",
+            "Could not parse expression with swc: Expression expected (mdxjs-rs:swc)",
             "should support an `MdxElement` (element, attribute w/ broken expression value)",
         );
 
